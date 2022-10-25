@@ -1,0 +1,60 @@
+!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+ 
+        <title>chat CAROline</title>
+        <meta name="description" content="Tuts+ Chat Application" />
+        <link rel="stylesheet" href="chat.css" />
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="menu">
+                <p class="welcome">Bienvenue sur le chat CAROline <b></b></p>
+                <p class="logout"><a id="exit" href="#">Quitter le Chat</a></p>
+            </div>
+            <div id="chatbox">
+				<div class ="reception"> bonjour, de quel documentation avez vous besoin?</div>
+            </div>
+            <form name="message" action="">
+                <input name="usermsg" type="text" id="usermsg" />
+                <input name="submitmsg" type="button" id="submitmsg" value="envoyer" />
+            </form>
+        </div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+				
+                $("#submitmsg").click(function () {
+                    var clientmsg = $("#usermsg").val();
+					$("#usermsg").val("");
+					$("#chatbox").append( '<div class="envoi">'+clientmsg+'</div>');
+					console.log(clientmsg);
+					$.ajax({
+						type: "POST",
+						url: "https://carrefourassistant-dev.carrefour.com/boticot/api/nlu/agents/test/parse?test=true",
+						 data: "{\"text\":\""+clientmsg+"\"}",
+						 beforeSend: function (request) {
+						request.withCredentials = false;
+					},
+						success: function(msg){
+						var myString=JSON.stringify(msg['response']['links']);
+						console.log(myString);
+						var division=myString.split("\"");
+						console.log(division);
+						console.log(division[11]);
+						  $("#chatbox").append( '<div class="reception">'+division[7]+':<br/>'+division[11].link(division[11])+'</div>'); 
+						  $("#chatbox").append( '<div class="reception">avez vous besoin d\'une autre documentation?</div>');
+						}
+					});
+                });
+                $("#exit").click(function () {
+                    var exit = confirm("Are you sure you want to end the session?");
+                    if (exit == true) {
+                    window.location = "index.php?logout=true";
+                    }
+                }); 
+            });
+        </script>
+    </body>
+</html>
